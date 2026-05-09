@@ -51,6 +51,9 @@ pub enum BuiltinKind {
     ToJson,
     HttpRequest,
     SetViewport,
+    Trim,
+    TrimStart,
+    TrimEnd,
 }
 
 impl BuiltinKind {
@@ -79,6 +82,9 @@ impl BuiltinKind {
             "toJson" => Some(ToJson),
             "httpRequest" => Some(HttpRequest),
             "setViewport" => Some(SetViewport),
+            "trim" => Some(Trim),
+            "trimStart" => Some(TrimStart),
+            "trimEnd" => Some(TrimEnd),
             _ => None,
         }
     }
@@ -221,6 +227,33 @@ impl BuiltinKind {
                 if let Object::Str(s) = &*args[0] {
                     let is_whitespace = s.chars().all(|c| c.is_whitespace());
                     Ok(Arc::new(Object::Boolean(is_whitespace)))
+                } else {
+                    Err(EvalError::InvalidFnParams)
+                }
+            }
+            Trim => {
+                assert_param_len!(args, 1);
+                if let Object::Str(s) = &*args[0] {
+                    let trimmed = s.trim();
+                    Ok(Arc::new(Object::Str(trimmed.to_string())))
+                } else {
+                    Err(EvalError::InvalidFnParams)
+                }
+            }
+            TrimStart => {
+                assert_param_len!(args, 1);
+                if let Object::Str(s) = &*args[0] {
+                    let trimmed = s.trim_start();
+                    Ok(Arc::new(Object::Str(trimmed.to_string())))
+                } else {
+                    Err(EvalError::InvalidFnParams)
+                }
+            }
+            TrimEnd => {
+                assert_param_len!(args, 1);
+                if let Object::Str(s) = &*args[0] {
+                    let trimmed = s.trim_end();
+                    Ok(Arc::new(Object::Str(trimmed.to_string())))
                 } else {
                     Err(EvalError::InvalidFnParams)
                 }
